@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Notification</title>
+</head>
+<body>
+<h3 th:text="'Hello, ' + ${receiverName} + '!'"></h3>
+<p>You have received a new notification:</p>
+<p><strong>Title:</strong> <span th:text="${title}"></span></p>
+<p><strong>Message:</strong> <span th:text="${message}"></span></p>
+<p>Regards,</p>
+<p>Your Application Team</p>
+</body>
+</html>

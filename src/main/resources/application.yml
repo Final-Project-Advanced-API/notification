@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notification_db
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      resource server:
+        jwt:
+          issuer-uri: https://keycloak.jelay.site/realms/stack-notes
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: bugzapper.hrd@gmail.com
+    password: dbblamycivtocqki
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  rabbitmq:
+    username: admin
+    password: admin
+    host: localhost
+    port: 5672
+    virtual-host: /
+    ssl:
+      enabled: false
+keycloak:
+  realm: stack-notes
+  resource: stack-notes-client
+  auth-server-url: https://keycloak.jelay.site/
+  credentials:
+    secret: tDbzKXKsHvvmFQAJ1bUSR87Dbia2ssfZ
+    client-id: stack-notes-client
+    provider: secret
+# Swagger configuration
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: stack-notes-client
+      client-secret: tDbzKXKsHvvmFQAJ1bUSR87Dbia2ssfZ
+      realm: stack-notes
+    tags-sorter: alpha
+eureka:
+  client:
+    service-url:
+      defaultZone: https://eureka.jelay.site/eureka
+    register-with-eureka: true
+    fetch-registry: true
+server:
+  port: 8082
