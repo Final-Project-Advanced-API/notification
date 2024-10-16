@@ -34,12 +34,15 @@ public class NotificationController {
                 .payload(savedNotification)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+        return new ResponseEntity(apiResponse, HttpStatus.CREATED);
     }
     @Operation(summary = "Get all notifications of a user")
-    @GetMapping("/{receiverId}")
-    public ResponseEntity<ApiResponse> getNotificationByReceiverId() {
-        List<NotificationResponse> notificationResponses = notificationService.getNotificationByReceiverId();
+    @GetMapping("/getNotificationOfUser")
+    public ResponseEntity<ApiResponse> getNotificationByReceiverId(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
+    ) {
+        List<NotificationResponse> notificationResponses = notificationService.getNotificationByReceiverId(pageNumber, pageSize);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("Notification of a user has founded.")
                 .status(HttpStatus.OK)
@@ -55,6 +58,33 @@ public class NotificationController {
         notificationService.notificationIsRead(id);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("Notification has updated to is read.")
+                .status(HttpStatus.OK)
+                .code(200)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity(apiResponse, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get notification by id")
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getNotificationById(@PathVariable String id) {
+        NotificationResponse notificationResponse = notificationService.getNotificationById(id);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .message("Notification has been found.")
+                .status(HttpStatus.OK)
+                .code(200)
+                .payload(notificationResponse)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity(apiResponse, HttpStatus.OK);
+    }
+
+    @Operation(summary = "delete notification")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteNotification(@PathVariable String id) {
+        notificationService.deleteNotification(id);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .message("Notification has been deleted.")
                 .status(HttpStatus.OK)
                 .code(200)
                 .timestamp(LocalDateTime.now())

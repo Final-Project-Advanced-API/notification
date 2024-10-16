@@ -25,6 +25,7 @@ public class NotificationResponse {
         this.title = notification.getTitle();
         this.message = notification.getMessage();
         this.isRead = notification.isRead();
+        this.createdAt = notification.getCreatedAt();
         this.sender = sender;
         this.receiver = receiver;
     }

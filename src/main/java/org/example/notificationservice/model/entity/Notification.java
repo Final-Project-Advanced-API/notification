@@ -23,6 +23,9 @@ public class Notification {
     @Column(nullable = false)
     private String message;
     private boolean isRead;
+    @Column(nullable = false, length = 100)
     private String receiverId;
+    @Column(nullable = false, length = 100)
+    private String senderId;
     private LocalDateTime createdAt;
 }
