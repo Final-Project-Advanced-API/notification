@@ -1,10 +1,7 @@
 package org.example.notificationservice.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity(name = "notifications")
 public class Notification {
     @Id

@@ -37,22 +37,23 @@ public class NotificationServiceImpl implements NotificationService {
     //send notification
     @Override
     public NotificationResponse sendNotificationToUser(NotificationRequest notificationRequest) {
-        String senderId = getCurrentUser.getUser();
+        String senderId= notificationRequest.getSenderId();
+        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
 
-        Notification notification = new Notification();
-        notification.setTitle(notificationRequest.getTitle());
-        notification.setMessage(notificationRequest.getMessage());
-        notification.setReceiverId(notificationRequest.getReceiverId());
-        notification.setSenderId(senderId);
-        notification.setCreatedAt(LocalDateTime.now());
-        notification.setRead(false);
+        Notification notification = Notification.builder()
+                .title(notificationRequest.getTitle())
+                .message(notificationRequest.getMessage())
+                .isRead(false)
+                .senderId(senderId)
+                .receiverId(notificationRequest.getReceiverId())
+                .createdAt(LocalDateTime.now())
+                .build();
 
         String routingKey = "user." + notification.getReceiverId();
 
         // Send notification to RabbitMQ
         rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, routingKey, notification);
         notificationRepository.save(notification);
-        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
         String receiverId= notification.getReceiverId();
         UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
         mailSenderService.sendEmailNotification(receiver.getEmail(), receiver.getUsername(), notificationRequest.getTitle(), notificationRequest.getMessage());

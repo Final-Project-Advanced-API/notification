@@ -26,9 +26,9 @@ spring:
           starttls:
             enable: true
   rabbitmq:
-    username: admin
-    password: admin
-    host: localhost
+    username: guest
+    password: guest
+    host: rabbitmq.jelay.site
     port: 5672
     virtual-host: /
     ssl:
@@ -43,7 +43,10 @@ keycloak:
     provider: secret
 # Swagger configuration
 springdoc:
+#  api-docs:
+#    path: /notification-service/v3/api-docs
   swagger-ui:
+#    path: /notification-service/swagger-ui.html
     oauth:
       client-id: stack-notes-client
       client-secret: tDbzKXKsHvvmFQAJ1bUSR87Dbia2ssfZ

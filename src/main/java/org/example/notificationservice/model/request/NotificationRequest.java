@@ -16,6 +16,9 @@ public class NotificationRequest {
     @NotNull(message = "Message must not be null.")
     @NotBlank(message = "Message must not be blank.")
     private String message;
+    @NotNull(message = "Sender Id must not be null.")
+    @NotBlank(message = "Sender Id must not be blank.")
+    private String senderId;
     @NotNull(message = "Receiver Id must not be null.")
     @NotBlank(message = "Receiver Id must not be blank.")
     private String receiverId;
