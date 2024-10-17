@@ -22,7 +22,7 @@ public class UserResponse {
     private LocalDate dob;
     private String profile;
     private String email;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
 }

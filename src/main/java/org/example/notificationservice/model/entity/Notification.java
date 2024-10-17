@@ -1,10 +1,7 @@
 package org.example.notificationservice.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity(name = "notifications")
 public class Notification {
     @Id
@@ -23,6 +21,9 @@ public class Notification {
     @Column(nullable = false)
     private String message;
     private boolean isRead;
+    @Column(nullable = false, length = 100)
     private String receiverId;
+    @Column(nullable = false, length = 100)
+    private String senderId;
     private LocalDateTime createdAt;
 }

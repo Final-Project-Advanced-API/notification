@@ -13,6 +13,8 @@ import org.example.notificationservice.repository.NotificationRepository;
 import org.example.notificationservice.service.MailSenderService;
 import org.example.notificationservice.service.NotificationService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
@@ -32,22 +34,26 @@ public class NotificationServiceImpl implements NotificationService {
     private final GetCurrentUser getCurrentUser;
     private final MailSenderService mailSenderService;
 
+    //send notification
     @Override
     public NotificationResponse sendNotificationToUser(NotificationRequest notificationRequest) {
-        Notification notification = new Notification();
-        notification.setTitle(notificationRequest.getTitle());
-        notification.setMessage(notificationRequest.getMessage());
-        notification.setReceiverId(notificationRequest.getReceiverId());
-        notification.setCreatedAt(LocalDateTime.now());
-        notification.setRead(false);
+        String senderId= notificationRequest.getSenderId();
+        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
+
+        Notification notification = Notification.builder()
+                .title(notificationRequest.getTitle())
+                .message(notificationRequest.getMessage())
+                .isRead(false)
+                .senderId(senderId)
+                .receiverId(notificationRequest.getReceiverId())
+                .createdAt(LocalDateTime.now())
+                .build();
 
         String routingKey = "user." + notification.getReceiverId();
 
         // Send notification to RabbitMQ
         rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, routingKey, notification);
         notificationRepository.save(notification);
-        String senderId = getCurrentUser.getUser();
-        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
         String receiverId= notification.getReceiverId();
         UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
         mailSenderService.sendEmailNotification(receiver.getEmail(), receiver.getUsername(), notificationRequest.getTitle(), notificationRequest.getMessage());
@@ -55,20 +61,24 @@ public class NotificationServiceImpl implements NotificationService {
         return new NotificationResponse(notification,sender,receiver);
     }
 
+    //get all notification of a receiver
     @Override
-    public List<NotificationResponse> getNotificationByReceiverId() {
+    public List<NotificationResponse> getNotificationByReceiverId(int pageNumber, int pageSize) {
         String receiverId = getCurrentUser.getUser();
-        List<Notification> notifications = notificationRepository.findByReceiverId(receiverId);
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<Notification> notifications = notificationRepository.findByReceiverId(receiverId, pageable); // Only get the content
 
         UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
 
         return notifications.stream().map(notification -> {
-            String senderId = notification.getReceiverId();
+            String senderId = notification.getSenderId();
             UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
             return new NotificationResponse(notification, sender, receiver);
         }).collect(Collectors.toList());
     }
 
+    //change notification to is read
     @Override
     public void notificationIsRead(String id) {
         Notification notification = notificationRepository.findById(UUID.fromString(id))
@@ -76,6 +86,28 @@ public class NotificationServiceImpl implements NotificationService {
 
         notification.setRead(true);
         notificationRepository.save(notification);
+    }
+
+    //get notification by id
+    @Override
+    public NotificationResponse getNotificationById(String id) {
+        Notification notification = notificationRepository.findById(UUID.fromString(id)).orElseThrow(
+                () -> new CustomNotfoundException("Notification not found.")
+        );
+        String senderId = notification.getSenderId();
+        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
+        String receiverId = notification.getReceiverId();
+        UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
+        return new NotificationResponse(notification, sender, receiver);
+    }
+
+    //delete notification by id
+    @Override
+    public void deleteNotification(String id) {
+        Notification notification = notificationRepository.findById(UUID.fromString(id)).orElseThrow(
+                () -> new CustomNotfoundException("Notification not found.")
+        );
+        notificationRepository.delete(notification);
     }
 
 }
