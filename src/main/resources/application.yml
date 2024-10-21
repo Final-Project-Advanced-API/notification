@@ -58,5 +58,7 @@ eureka:
       defaultZone: https://eureka.jelay.site/eureka
     register-with-eureka: true
     fetch-registry: true
+  instance:
+    prefer-ip-address: true
 server:
   port: 8082
