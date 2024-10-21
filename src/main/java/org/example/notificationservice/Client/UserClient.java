@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "user-service" ,url = "http://localhost:8081",fallbackFactory = UserClientFallback.class,configuration = FeignClientConfig.class)
+@FeignClient(name = "user-service",fallbackFactory = UserClientFallback.class,configuration = FeignClientConfig.class)
 public interface UserClient {
     @GetMapping("/api/v1/users/{userId}")
     ApiResponse<UserResponse> getUserById(@PathVariable UUID userId);
