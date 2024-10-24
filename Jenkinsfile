@@ -119,8 +119,19 @@ pipeline {
                 emailext (
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "Build Success: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                    body: "<b>Stage</b>: ✅ Notification-Service \
-                           %0A<b>Status</b>: This Notification-Service was built successfully 🚀",
+                    body: """
+                        Hello Team,<br><br>
+                
+                        We are thrilled to inform you that the recent build has completed successfully! 🎉👨‍💻<br><br>
+                
+                        <b>Stage</b>: ✅  Notification-Service 🤗🌟<br>
+                        <b>Status</b>: The  Notification-Service was built successfully 🚀<br><br>
+                
+                        Thank you!<br><br>
+                
+                        Best regards,<br>
+                        DevOps Team
+                        """,
                     mimeType: 'text/html'
                 )
                 
