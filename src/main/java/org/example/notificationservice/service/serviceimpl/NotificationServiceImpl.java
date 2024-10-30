@@ -40,28 +40,37 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationResponse sendNotificationToUser(NotificationRequest notificationRequest) {
-        String senderId= notificationRequest.getSenderId();
-        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
+        try {
+            String senderId= notificationRequest.getSenderId();
+            UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
+            if(sender == null) {
+                throw new CustomNotfoundException("User not found");
+            }
+            String receiverId= notificationRequest.getReceiverId();
+            UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
+            if(receiver == null) {
+                throw new CustomNotfoundException("User not found");
+            }
+            Notification notification = Notification.builder()
+                    .title(notificationRequest.getTitle())
+                    .message(notificationRequest.getMessage())
+                    .isRead(false)
+                    .senderId(senderId)
+                    .receiverId(notificationRequest.getReceiverId())
+                    .createdAt(LocalDateTime.now())
+                    .build();
 
-        Notification notification = Notification.builder()
-                .title(notificationRequest.getTitle())
-                .message(notificationRequest.getMessage())
-                .isRead(false)
-                .senderId(senderId)
-                .receiverId(notificationRequest.getReceiverId())
-                .createdAt(LocalDateTime.now())
-                .build();
+            String routingKey = "user." + notification.getReceiverId();
 
-        String routingKey = "user." + notification.getReceiverId();
+            // Send notification to RabbitMQ
+            rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, routingKey, notification);
+            notificationRepository.save(notification);
+            mailSenderService.sendEmailNotification(receiver.getEmail(), receiver.getUsername(), notificationRequest.getTitle(), notificationRequest.getMessage());
 
-        // Send notification to RabbitMQ
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, routingKey, notification);
-        notificationRepository.save(notification);
-        String receiverId= notification.getReceiverId();
-        UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
-        mailSenderService.sendEmailNotification(receiver.getEmail(), receiver.getUsername(), notificationRequest.getTitle(), notificationRequest.getMessage());
-
-        return new NotificationResponse(notification,sender,receiver);
+            return new NotificationResponse(notification,sender,receiver);
+        }catch (Exception e) {
+            throw new CustomNotfoundException("User not found");
+        }
     }
 
     @Override
