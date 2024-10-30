@@ -41,12 +41,24 @@ keycloak:
     secret: tDbzKXKsHvvmFQAJ1bUSR87Dbia2ssfZ
     client-id: stack-notes-client
     provider: secret
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      UserClientCircuit:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000 # 10 seconds
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        exponential-max-wait-duration-in-open-state: 5s
+        minimum-number-of-calls: 5
+        sliding-window-size: 10
+        event-consumer-buffer-size: 10
 # Swagger configuration
 springdoc:
-#  api-docs:
-#    path: /notification-service/v3/api-docs
   swagger-ui:
-#    path: /notification-service/swagger-ui.html
     oauth:
       client-id: stack-notes-client
       client-secret: tDbzKXKsHvvmFQAJ1bUSR87Dbia2ssfZ

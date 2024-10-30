@@ -1,58 +1,97 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Notification</title>
+  <title>Notification Email</title>
   <style>
     body {
-      background-color: #f0f4f8;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #e5effa, #f9fcff);
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
+    .email-container {
+      max-width: 420px;
       background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 30px 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      color: #344054;
+    }
+    .email-header {
+      background: linear-gradient(135deg, #6a92cb, #f8fbff);
       text-align: center;
-    }
-    .logo {
-      width: 200px;
-      margin-bottom: 20px;
-    }
-    .message{
-      background-color: #98A2B3;
       color: #ffffff;
+      border-bottom: 4px solid #c5d4e4;
+    }
+    .email-header img {
+      width: 250px;
+    }
+    .email-content {
+      padding: 30px;
+      text-align: left;
+      color: #007AFF;
+    }
+    .greeting {
+      font-size: 20px;
+      font-weight: bold;
+      color: #344054;
+      margin-bottom: 15px;
+    }
+    .message-box {
+      background: linear-gradient(135deg, #f8fbff, #e8eff5);
+      border-left: 5px solid #6a92cb;
+      padding: 25px;
+      border-radius: 16px;
+      line-height: 1.6;
+      margin: 20px 0;
       font-size: 16px;
-      font-weight: normal;
-      padding: 15px 25px;
-      border-radius: 6px;
-      margin-top: 20px;
+      color: #344054;
+    }
+    .message-title {
+      font-weight: bold;
+      font-size: 18px;
+      color: #344054;
+      margin-bottom: 10px;
+      padding-right: 3px;
     }
     .note {
-      color: #6b7280;
-      margin-top: 20px;
+      color: #98A2B3;
       font-size: 14px;
+      margin-top: 25px;
+      text-align: center;
     }
-    .title{
-      font-size: 18px;
-      font-weight: bold;
+    .email-footer {
+      padding: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: #98A2B3;
+      background-color: #f3f4f6;
+      border-top: 1px solid #e2e8f0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img class="logo" src="https://stacknotes.s3.ap-southeast-2.amazonaws.com/70babdb5-c35a-46b6-af8b-347f93da01c0.png" alt="logo"/>
-    <h3 th:text="'Hello, ' + ${receiverName} + '!'"></h3>
-    <p class="message"><span class="title" th:text="${title}"></span> <span th:text="${message}"></span></p>
-    <div class="note">If you have any questions, feel free to contact our support team.</div>
-    <div class="footer">© 2024 StackNotes. All rights reserved.</div>
+<div class="email-container">
+  <div class="email-header">
+    <img src="https://stacknotes.s3.ap-southeast-2.amazonaws.com/ac68bcbc-4458-4dec-acbe-1554f8310bb8.png" alt="Logo">
   </div>
+  <div class="email-content">
+    <p class="greeting" th:text="'Hello, ' + ${receiverName} + '!'">Hello, User!</p>
+    <div class="message-box">
+      <span class="message-title" th:text="${title}">Title</span>
+      <span th:text="${message}">
+        This is your notification message content
+      </span>
+    </div>
+    <p class="note">If you have any questions, feel free to <a href="mailto:support@stacknotes.com" style="color:#007AFF; text-decoration: none;">contact our support team</a>.</p>
+  </div>
+  <div class="email-footer">
+    &copy; 2024 StackNotes. All rights reserved.
+  </div>
+</div>
 </body>
 </html>

@@ -1,10 +1,12 @@
 package org.example.notificationservice.service.serviceimpl;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.example.notificationservice.Client.UserClient;
 import org.example.notificationservice.config.GetCurrentUser;
 import org.example.notificationservice.config.RabbitMQConfig;
 import org.example.notificationservice.exception.CustomNotfoundException;
+import org.example.notificationservice.model.dto.ApiResponse;
 import org.example.notificationservice.model.dto.NotificationResponse;
 import org.example.notificationservice.model.dto.UserResponse;
 import org.example.notificationservice.model.entity.Notification;
@@ -15,9 +17,11 @@ import org.example.notificationservice.service.NotificationService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +38,6 @@ public class NotificationServiceImpl implements NotificationService {
     private final GetCurrentUser getCurrentUser;
     private final MailSenderService mailSenderService;
 
-    //send notification
     @Override
     public NotificationResponse sendNotificationToUser(NotificationRequest notificationRequest) {
         String senderId= notificationRequest.getSenderId();
@@ -61,12 +64,24 @@ public class NotificationServiceImpl implements NotificationService {
         return new NotificationResponse(notification,sender,receiver);
     }
 
+    @Override
+    public NotificationResponse getNotificationById(String id) {
+        Notification notification = notificationRepository.findById(UUID.fromString(id)).orElseThrow(
+                () -> new CustomNotfoundException("Notification not found.")
+        );
+        String senderId = notification.getSenderId();
+        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
+        String receiverId = notification.getReceiverId();
+        UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
+        return new NotificationResponse(notification, sender, receiver);
+    }
+
     //get all notification of a receiver
     @Override
     public List<NotificationResponse> getNotificationByReceiverId(int pageNumber, int pageSize) {
         String receiverId = getCurrentUser.getUser();
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize);
         List<Notification> notifications = notificationRepository.findByReceiverId(receiverId, pageable); // Only get the content
 
         UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
@@ -81,33 +96,27 @@ public class NotificationServiceImpl implements NotificationService {
     //change notification to is read
     @Override
     public void notificationIsRead(String id) {
+        String receiverId = getCurrentUser.getUser();
         Notification notification = notificationRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new CustomNotfoundException("Notification not found."));
-
+        if(!receiverId.equals(notification.getReceiverId())){
+            throw new CustomNotfoundException("You don't have permission to read this notification.");
+        }
         notification.setRead(true);
         notificationRepository.save(notification);
-    }
-
-    //get notification by id
-    @Override
-    public NotificationResponse getNotificationById(String id) {
-        Notification notification = notificationRepository.findById(UUID.fromString(id)).orElseThrow(
-                () -> new CustomNotfoundException("Notification not found.")
-        );
-        String senderId = notification.getSenderId();
-        UserResponse sender = userClient.getUserById(UUID.fromString(senderId)).getPayload();
-        String receiverId = notification.getReceiverId();
-        UserResponse receiver = userClient.getUserById(UUID.fromString(receiverId)).getPayload();
-        return new NotificationResponse(notification, sender, receiver);
     }
 
     //delete notification by id
     @Override
     public void deleteNotification(String id) {
-        Notification notification = notificationRepository.findById(UUID.fromString(id)).orElseThrow(
-                () -> new CustomNotfoundException("Notification not found.")
-        );
+        String receiverId = getCurrentUser.getUser();
+        Notification notification = notificationRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new CustomNotfoundException("Notification not found."));
+        if(!receiverId.equals(notification.getReceiverId())){
+            throw new CustomNotfoundException("You don't have permission to delete this notification.");
+        }
         notificationRepository.delete(notification);
     }
+
 
 }

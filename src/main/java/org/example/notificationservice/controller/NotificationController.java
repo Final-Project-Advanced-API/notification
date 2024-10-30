@@ -39,7 +39,7 @@ public class NotificationController {
     @Operation(summary = "Get all notifications of a user")
     @GetMapping("/getNotificationOfUser")
     public ResponseEntity<ApiResponse> getNotificationByReceiverId(
-            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         List<NotificationResponse> notificationResponses = notificationService.getNotificationByReceiverId(pageNumber, pageSize);
