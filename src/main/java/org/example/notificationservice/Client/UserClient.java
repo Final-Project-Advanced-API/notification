@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@FeignClient(name = "user-service",url = "http://localhost:8081",configuration = FeignClientConfig.class)
+@FeignClient(name = "user-service",url = "https://userservice.jelay.site",configuration = FeignClientConfig.class)
 public interface UserClient {
     @CircuitBreaker(name = "userClient", fallbackMethod = "userFallback")
     @GetMapping("/api/v1/users/{userId}")
