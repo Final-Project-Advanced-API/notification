@@ -25,6 +25,7 @@ public class NotificationController {
     private final NotificationService notificationService;
     @Operation(summary = "send notification")
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ApiResponse> sendNotificationToUser(@RequestBody NotificationRequest notificationRequest) {
         NotificationResponse savedNotification = notificationService.sendNotificationToUser(notificationRequest);
         ApiResponse apiResponse = ApiResponse.builder()
