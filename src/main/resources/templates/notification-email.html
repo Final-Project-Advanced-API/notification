@@ -22,10 +22,13 @@
       color: #344054;
     }
     .email-header {
-      background: linear-gradient(135deg, #6a92cb, #f8fbff);
+      /*background: linear-gradient(135deg, #6a92cb, #f8fbff);*/
+      background-color: #f8f9fa;
       text-align: center;
       color: #ffffff;
-      border-bottom: 4px solid #c5d4e4;
+      padding: 10px 0;
+      /*border-bottom: 4px solid #c5d4e4;*/
+      border-radius: 20px;
     }
     .email-header img {
       width: 250px;
@@ -42,8 +45,11 @@
       margin-bottom: 15px;
     }
     .message-box {
-      background: linear-gradient(135deg, #f8fbff, #e8eff5);
-      border-left: 5px solid #6a92cb;
+      /*background: linear-gradient(135deg, #f8fbff, #e8eff5);*/
+      border-bottom: 1.5px solid #e2e8f0;
+      border-top: 1.5px solid #e2e8f0;
+      border-right: 1.5px solid #e2e8f0;
+      border-left: 5px solid #e2e8f0;
       padding: 25px;
       border-radius: 16px;
       line-height: 1.6;
@@ -69,7 +75,7 @@
       text-align: center;
       font-size: 13px;
       color: #98A2B3;
-      background-color: #f3f4f6;
+      background-color: #f8f9fa;
       border-top: 1px solid #e2e8f0;
     }
   </style>
@@ -84,10 +90,10 @@
     <div class="message-box">
       <span class="message-title" th:text="${title}">Title</span>
       <span th:text="${message}">
-        This is your notification message content
+        This is your notification message content.
       </span>
     </div>
-    <p class="note">If you have any questions, feel free to <a href="mailto:support@stacknotes.com" style="color:#007AFF; text-decoration: none;">contact our support team</a>.</p>
+    <p class="note">If you have any questions, feel free to <a href="mailto:stacknotes@gmail.com" style="color:#007AFF; text-decoration: none;">contact our support team</a>.</p>
   </div>
   <div class="email-footer">
     &copy; 2024 StackNotes. All rights reserved.
